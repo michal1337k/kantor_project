@@ -18,9 +18,17 @@
         </div>
         {{ form_row(form.submit) }}
     {{ form_end(form) }}
+
+
     {% for msg in app.flashes('result') %}
         <div class="alert alert-success mt-3">
             Otrzymasz: <strong>{{ msg.amount|number_format(2, ',', ' ') }}</strong> {{ msg.code }}
+        </div>
+    {% endfor %}
+
+    {% for msg in app.flashes('error') %}
+        <div class="alert alert-danger mt-3">
+            {{ msg }}
         </div>
     {% endfor %}
 

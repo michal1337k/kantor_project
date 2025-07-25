@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class CurrencyExchangeType extends AbstractType
 {
@@ -19,6 +20,14 @@ class CurrencyExchangeType extends AbstractType
                 'label' => 'Kwota',
                 'currency' => false,
                 'divisor' => 1,
+                'constraints' => [
+                    new Assert\Type([
+                        'type' => 'numeric'
+                    ]),
+                    new Assert\GreaterThan([
+                        'value' => 0
+                    ]),
+                ],
             ])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
@@ -26,8 +35,8 @@ class CurrencyExchangeType extends AbstractType
                 'label' => 'Waluta docelowa',
             ])
             ->add('submit', SubmitType::class, [
-            'label' => 'Przelicz',
-            'attr' => ['class' => 'btn btn-primary mt-3']
+                'label' => 'Przelicz',
+                'attr' => ['class' => 'btn btn-primary mt-3']
             ]);
     }
 }

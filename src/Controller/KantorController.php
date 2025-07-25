@@ -16,8 +16,7 @@ final class KantorController extends AbstractController
     #[Route('/kantor', name: 'app_kantor')]
     public function index(Request $request, EntityManagerInterface $em, ExchangeRateFetcher $fetcher): Response
     {   
-        
-        // Sprawdzamy czy mamy świeże dane (dzisiaj)
+
         $today = (new \DateTimeImmutable())->format('Y-m-d');
         $updatedAt = $em->getRepository(Currency::class)
                         ->createQueryBuilder('c')
@@ -34,19 +33,24 @@ final class KantorController extends AbstractController
 
         $result = null;
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $amount = $data['amount'];
-            /** @var Currency $currency */
-            $currency = $data['currency'];
-            $result = $amount / $currency->getAsk(); // wymiana PLN na obcą walutę
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $data = $form->getData();   
+                $amount = $data['amount'];
+                /** @var Currency $currency */
+                $currency = $data['currency'];
+                $result = $amount / $currency->getAsk(); 
 
-            $this->addFlash('result', [
-                'amount' => $result,
-                'code' => $currency->getCode(),
-            ]);
+                $this->addFlash('result', [
+                    'amount' => $result,
+                    'code' => $currency->getCode(),
+                ]);
 
-            return $this->redirectToRoute('app_kantor');
+                return $this->redirectToRoute('app_kantor');
+            } else {
+                $this->addFlash('error', 'Wprowadź poprawną kwotę w formacie liczbowym (np. 100.00)');
+                return $this->redirectToRoute('app_kantor');
+            }
         }
 
         return $this->render('kantor/index.html.twig', [
